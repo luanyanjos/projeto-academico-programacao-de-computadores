@@ -1,0 +1,237 @@
+#include <stdio.h>
+#include <string.h>
+
+#define max_aluno 100
+
+struct aluno_struct {
+    char nome[50];
+    char email[50];
+    char rgm[15];
+
+    float notaA1;
+    float notaA2;
+    float notaF;
+};
+
+int main() {
+    int opcao_usuario_case1;
+    int opcao;
+
+    struct aluno_struct aluno[max_aluno];
+    int total_alunos = 0;
+
+    do {
+        system("cls");
+        printf("---------CADASTRO DO ALUNO --------\n");
+        printf("1. CADASTRAR ALUNO\n");
+        printf("2. LISTAR ALUNO\n");
+        printf("3. ADICIONAR NOTA\n");
+        printf("4. DELETAR ALUNO\n");
+        printf("5. SAIR\n");
+
+        printf("escolha opção: ");
+        scanf("%d", &opcao);
+
+        switch (opcao) {
+        case 1:
+            do {
+                if (total_alunos < max_aluno) {
+                    printf("Nome do aluno: ");
+                    scanf(" %[^\n]", aluno[total_alunos].nome);
+
+                    printf("RGM: ");
+                    scanf(" %[^\n]", aluno[total_alunos].rgm);
+
+                    printf("Email: ");
+                    scanf(" %[^\n]", aluno[total_alunos].email);
+
+                    aluno[total_alunos].notaA1 = -1;
+                    aluno[total_alunos].notaA2 = -1;
+                    aluno[total_alunos].notaF = -1;
+
+                    total_alunos++;
+
+                    printf("ALUNO CADASTRADO COM SUCESSO\n");
+                    printf("1 - CADASTRAR NOVO ALUNO\n");
+                    printf("2 - VOLTAR AO MENU\n");
+                    printf("Escolha uma opção: ");
+                    scanf("%d", &opcao_usuario_case1);
+                } else {
+                    printf("Lista de Aluno Cheia.\n");
+                    break;
+                }
+            } while (opcao_usuario_case1 != 2 && total_alunos < max_aluno);
+            break;
+
+        case 2: {
+            int sair_listagem = 0;
+            while (sair_listagem != 1) {
+                for (int i = 0; i < total_alunos; i++) {
+                    printf("Aluno %d:\n", i + 1);
+                    printf("Nome: %s\n", aluno[i].nome);
+                    printf("RGM: %s\n", aluno[i].rgm);
+                    printf("Email: %s\n", aluno[i].email);
+                    
+                    // Notas
+                    if (aluno[i].notaA1 == -1){
+                        printf("Nota A1: [nao inserida]\n");
+                    }else{
+                        printf("Nota A1: %.2f\n", aluno[i].notaA1);
+                    }
+                    
+                    if (aluno[i].notaA2 == -1){
+                        printf("Nota A2: [nao inserida]\n");
+                    }else{
+                        printf("Nota A2: %.2f\n", aluno[i].notaA2);
+                    }
+
+                    if (aluno[i].notaF == -1)
+                        printf("Nota AF: [nao inserida]\n");
+                    else
+                        printf("Nota AF: %.2f\n", aluno[i].notaF);
+                    
+                    // Situação do aluno
+                    if (aluno[i].notaA1 == -1 || aluno[i].notaA2 == -1) {
+                        printf("Situação: Notas insuficientes para avaliação\n");
+                    } else {
+                        float soma = aluno[i].notaA1 + aluno[i].notaA2;
+                    
+                        if (soma >= 6.0) {
+                            printf("Situação:  Aprovado\n");
+                        } else {
+                            if (aluno[i].notaF == -1) {
+                                printf("Situação:  Em Avaliação Final (aguardando nota AF)\n");
+                            } else {
+                                // Substitui a menor nota pela AF
+                                float a1 = aluno[i].notaA1;
+                                float a2 = aluno[i].notaA2;
+                                float af = aluno[i].notaF;
+                    
+                                if (a1 < a2) a1 = af;
+                                else a2 = af;
+                    
+                                float media_final = a1 + a2;
+                    
+                                if (media_final >= 6.0)
+                                    printf("Situação:  Aprovado após AF\n");
+                                else
+                                    printf("Situação:  Reprovado\n");
+                            }
+                        }
+                    }
+                    printf("-----------------------------\n");
+                }
+                printf("Digite 1 para voltar ao menu principal: ");
+                scanf("%d", &sair_listagem);
+            }
+        } break;
+
+        case 3: {
+            if (total_alunos == 0) {
+                printf("Nenhum aluno cadastrado.\n");
+                break;
+            }
+
+            char rgm_busca[15];
+            int encontrado = 0;
+
+            printf("Digite o RGM do aluno: ");
+            scanf(" %[^\n]", rgm_busca);
+
+            for (int i = 0; i < total_alunos; i++) {
+                if (strcmp(aluno[i].rgm, rgm_busca) == 0) {
+                    encontrado = 1;
+                    int continuar = 1;
+
+                    while (continuar == 1) {
+                        int opcao_nota;
+                        printf("\nAluno: %s\n", aluno[i].nome);
+                        printf("1 - Inserir Nota A1\n");
+                        printf("2 - Inserir Nota A2\n");
+                        printf("3 - Inserir Nota AF\n");
+                        printf("Escolha a opção: ");
+                        scanf("%d", &opcao_nota);
+
+                        float nota;
+                        printf("Digite a nota (0 a 5): ");
+                        scanf("%f", &nota);
+
+                        if (nota < 0 || nota > 5) {
+                            printf("Nota inválida. Digite entre 0 e 5.\n");
+                            continue;
+                        }
+
+                        switch (opcao_nota) {
+                        case 1:
+                            aluno[i].notaA1 = nota;
+                            printf("Nota A1 inserida com sucesso!\n");
+                            break;
+                        case 2:
+                            aluno[i].notaA2 = nota;
+                            printf("Nota A2 inserida com sucesso!\n");
+                            break;
+                        case 3:
+                            aluno[i].notaF = nota;
+                            printf("Nota AF inserida com sucesso!\n");
+                            break;
+                        default:
+                            printf("Opção Inválida\n");
+                            break;
+                        }
+
+                        printf("Deseja continuar? (1 - Sim / 0 - Nao): ");
+                        scanf("%d", &continuar);
+                    }
+                }
+            }
+
+            if (!encontrado) {
+                printf("Aluno com RGM %s não encontrado.\n", rgm_busca);
+            }
+        } break;
+
+        case 4: {
+            if (total_alunos == 0) {
+                printf("Nenhum aluno cadastrado.\n");
+                break;
+            }
+
+            char rgm_remover[15];
+            int encontrado = 0;
+
+            printf("Digite o RGM do aluno que deseja deletar: ");
+            scanf(" %[^\n]", rgm_remover);
+
+            for (int i = 0; i < total_alunos; i++) {
+                if (strcmp(aluno[i].rgm, rgm_remover) == 0) {
+                    encontrado = 1;
+
+                    for (int j = i; j < total_alunos - 1; j++) {
+                        aluno[j] = aluno[j + 1];
+                    }
+
+                    total_alunos--;
+
+                    printf("Aluno com RGM %s removido com sucesso.\n", rgm_remover);
+                    break;
+                }
+            }
+
+            if (!encontrado) {
+                printf("Aluno com RGM %s não encontrado.\n", rgm_remover);
+            }
+        } break;
+
+        case 5:
+            printf("Saindo do programa...\n");
+            break;
+
+        default:
+            printf("Opção inválida.\n");
+            break;
+        }
+
+    } while (opcao != 5);
+
+    return 0;
+}
